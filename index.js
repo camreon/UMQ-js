@@ -3,48 +3,33 @@ function Source() {
 	// this.info
 }
 Source.prototype = {
-	getAudio: function(url) {},
-	getInfo: function(url) {}
+	GetAudio: function(url) {},
+	GetInfo: function(url) {}
 };
-function Youtube() {}
+
+function Youtube() {};
 Youtube.prototype = new Source();
-Youtube.prototype.getAudio = getAudioURL;
-Youtube.prototype.getInfo = setNowPlaying;
+Youtube.prototype.GetAudio = GetAudioURL;
+Youtube.prototype.GetInfo = SetNowPlaying;
 Youtube.prototype.constructor = Youtube;
 
-//comment
 
+var AUTOPLAY = 0;
 
+///////////////////////////////////////////////////////////////////////////
 
-
-$('#add').click(function () {
-	// determine source
-	var youtube = new Youtube();
-
-	// get value of field
-	var link = youtube.getAudio( $("#addLink").val() );
-
-	// play it
-	$('#player').attr('src', link);
-
-	youtube.getInfo(link);
-
-	// add it to playlist
-
-})
-
-function getAudioURL(link) {
-	var video_id = link.split('v=')[1];
+function GetAudioURL(url) {
+	var video_id = url.split('v=')[1];
 	var ampersandPosition = video_id.indexOf('&');
 	if(ampersandPosition != -1) {
 	  video_id = video_id.substring(0, ampersandPosition);
 	}
-	return( "http://www.youtube.com/embed/"+ video_id +"?autoplay=1" );
+	return( "http://www.youtube.com/embed/"+ video_id +"?autoplay=" + AUTOPLAY );
 }
 
-function setNowPlaying(link) {
-	// 			   http://gdata.youtube.com/feeds/api/videos/	id 	  ?v=2&alt=json%27
-	var dataURL = 'http://gdata.youtube.com/feeds/api/videos/' + $("#addLink").val().split('v=')[1] + "?v=2&alt=json";
+function SetNowPlaying(url) {
+	// 			   http://gdata.youtube.com/feeds/api/videos/	 id 	        		?v=2&alt=json
+	var dataURL = 'http://gdata.youtube.com/feeds/api/videos/' + url.split('v=')[1] + "?v=2&alt=json";
 	var json = (function() {
     	var json = null;
 	    $.ajax({
@@ -59,12 +44,40 @@ function setNowPlaying(link) {
 	    return json;
     })();
 
-	$("#playlist").text(json.entry.title.$t);
+	return json.entry.title.$t
+}
+
+function AddToPlaylist(url) {
+	// determine source
+	var source = new Youtube();
+
+	// get input
+	var audioURL = source.GetAudio(url);
+
+	// play it
+	$('#player').attr('src', audioURL);
+
+	// add it to playlist
+	var title = source.GetInfo(url);
+	$("#playlist li:last").append("<li>" + title + "</li>");
+	//TODO remove need for blank first li
 }
 
 
-$('#addLink').keyup(function (e) {
+///////////////////////////////////////////////////////////////////////////
+
+$('#add').click(function () {
+	AddToPlaylist( $("#input").val() );
+})
+
+$('#input').keyup(function (e) {
 	if (e.originalEvent.keyCode == 13) {
 		$('#add').trigger('click');
 	}
+});
+
+$(function() {
+	$("input").focus();
+
+	AddToPlaylist("https://www.youtube.com/watch?v=BOAk0XklCpI"); //debug
 });
