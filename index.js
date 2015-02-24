@@ -45,6 +45,7 @@ function SetNowPlaying(url) {
     })();
 
 	return json.entry.title.$t
+	//comment
 }
 
 function AddToPlaylist(url) {
