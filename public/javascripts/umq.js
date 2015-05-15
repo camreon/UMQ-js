@@ -14,7 +14,7 @@ Youtube.prototype.GetInfo = SetNowPlaying;
 Youtube.prototype.constructor = Youtube;
 
 
-var AUTOPLAY = 0;
+var AUTOPLAY = 1;
 
 ///////////////////////////////////////////////////////////////////////////
 
@@ -60,14 +60,13 @@ function AddToPlaylist(url) {
 
 	// add it to playlist
 	var title = source.GetInfo(url);
-	$("#playlist li:last").append("<li>" + title + "</li>");
-	//TODO remove need for blank first li
+	console.log(title);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////
 
-$('#add').click(function () {
+$('#playlist > li').click(function () {
 	AddToPlaylist( $("#input").val() );
 })
 
@@ -80,5 +79,5 @@ $('#input').keyup(function (e) {
 $(function() {
 	$("input").focus();
 
-	AddToPlaylist("https://www.youtube.com/watch?v=BOAk0XklCpI"); //debug
+	//AddToPlaylist("https://www.youtube.com/watch?v=BOAk0XklCpI"); //debug
 });
