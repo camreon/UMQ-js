@@ -63,7 +63,7 @@ app.get('/', function(req, res) {
             client.end();
             res.render('index', { playlist: results })
         });
-
+no
         if (err) { console.log(err); }
     });
 });
