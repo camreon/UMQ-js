@@ -11,3 +11,10 @@
 	display: block;
 }
 
+#playlist > li {
+	margin-bottom: 5px;
+}
+
+#playlist > li:hover {
+	cursor: pointer;
+}

@@ -2,7 +2,7 @@ extends layout
 
 block content
 	form(method='post', action='/playlist')
-		input#input(type='text', name='url' value='https://www.youtube.com/watch?v=FOns9gObzHE')
+		input#input(type='text', name='url' value='')
 		input(type='submit' value='ADD')
 
 	h2 PLAYLIST
@@ -11,7 +11,14 @@ block content
 			li=url
 
 	h2 PLAYER
-	iframe#player(width='420', height='36', src='', frameborder='1px', allowfullscreen='')
+	div#player
 
 	script(src='https://code.jquery.com/jquery-2.1.3.js')
 	script(src='/javascripts/umq.js')
+
+	| <script type='text/javascript'>
+	| var tag = document.createElement('script');
+	| tag.src = "https://www.youtube.com/iframe_api";
+	| var firstScriptTag = document.getElementsByTagName('script')[0];
+	| firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+	| </script>

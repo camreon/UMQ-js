@@ -13,22 +13,22 @@ Youtube.prototype.GetAudio = GetAudioURL;
 Youtube.prototype.GetInfo = SetNowPlaying;
 Youtube.prototype.constructor = Youtube;
 
-
 var AUTOPLAY = 1;
+var player;
+var nowPlaying;
 
 ///////////////////////////////////////////////////////////////////////////
 
 function GetAudioURL(url) {
 	var video_id = url.split('v=')[1];
 	var ampersandPosition = video_id.indexOf('&');
-	if(ampersandPosition != -1) {
-	  video_id = video_id.substring(0, ampersandPosition);
-	}
+	if(ampersandPosition != -1)
+		video_id = video_id.substring(0, ampersandPosition);
+
 	return( "http://www.youtube.com/embed/"+ video_id +"?autoplay=" + AUTOPLAY );
 }
 
 function SetNowPlaying(url) {
-	// 			   http://gdata.youtube.com/feeds/api/videos/	 id 	        		?v=2&alt=json
 	var dataURL = 'http://gdata.youtube.com/feeds/api/videos/' + url.split('v=')[1] + "?v=2&alt=json";
 	var json = (function() {
     	var json = null;
@@ -45,29 +45,26 @@ function SetNowPlaying(url) {
     })();
 
 	return json.entry.title.$t
-	//comment
 }
 
-function AddToPlaylist(url) {
-	// determine source
-	var source = new Youtube();
+function Play(url) {
+	var source = new Youtube(); 		 // determine source
+	var audioURL = source.GetAudio(url); // get input
+	player.loadVideoByUrl(audioURL);     // play it
+	alert("playing track number " + nowPlaying);
+}
 
-	// get input
-	var audioURL = source.GetAudio(url);
-
-	// play it
-	$('#player').attr('src', audioURL);
-
-	// add it to playlist
-	var title = source.GetInfo(url);
-	console.log(title);
+function NextTrack() {
+	var url = $("#playlist li:eq(" + (nowPlaying++) + ")").get(0);
+	return url.innerText;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////
 
-$('#playlist > li').click(function () {
-	AddToPlaylist( $("#input").val() );
+$('#playlist > li').click(function (e) {
+	nowPlaying = $(e.target).index() + 1; // set now playing track
+	Play(e.target.innerText);
 })
 
 $('#input').keyup(function (e) {
@@ -79,5 +76,31 @@ $('#input').keyup(function (e) {
 $(function() {
 	$("input").focus();
 
-	//AddToPlaylist("https://www.youtube.com/watch?v=BOAk0XklCpI"); //debug
+	// show titles for each URL
+	// $("#playlist > li").each(function (i) {
+	// 	var url = $(this).text();
+	// 	var source = new Youtube();
+	// 	var title = source.GetInfo(url);
+
+	// 	var titleElement = document.createElement('div');
+
+	// 	$(this)[0].appendChild(titleElement);
+	// });
 });
+
+function onYouTubeIframeAPIReady() {
+	player = new YT.Player('player', {
+		events: {
+			'onReady': onPlayerReady,
+			'onStateChange': onPlayerStateChange
+		}
+	});
+}
+function onPlayerReady(event) {
+	alert("player ready");
+}
+function onPlayerStateChange(event) {
+	if (event.data == YT.PlayerState.ENDED) {
+    	Play(NextTrack());
+    }
+}

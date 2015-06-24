@@ -56,7 +56,6 @@ app.get('/', function(req, res) {
 
     pg.connect(connectionString, function(err, client, done) {
         query = client.query('SELECT * FROM playlist;');
-
         query.on('row', function(row) {
             results.push(row.url);
         });
@@ -69,22 +68,26 @@ app.get('/', function(req, res) {
     });
 });
 
+//TODO check if input url is valid before insert
+//TODO add to playlist without reloading page?
 app.post('/playlist', function(req, res) {
     pg.connect(connectionString, function(err, client, done) {
-        query = client.query('INSERT INTO playlist (url) VALUES($1)',
-                             [req.body.url]);
-
-        query.on('end', function() {
-            client.end();
+        if (req.body.url === "" || req.body.url == null) {
             res.redirect('/');
-        });
-
+            return;
+        } else {
+            query = client.query('INSERT INTO playlist (url) VALUES($1)',
+                                 [req.body.url]);
+            query.on('end', function() {
+                client.end();
+                res.redirect('/');
+            });
+        }
         if (err) { console.log(err); }
     });
 });
-  // .put(function(req, res) {
-  //   res.send('Update the book');
-  // });
-
+// .put(function(req, res) {
+//   res.send('Update the book');
+// });
 
 module.exports = app;
