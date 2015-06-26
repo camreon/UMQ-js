@@ -1,22 +1,27 @@
 # UMQ
 
 INITIAL LOCAL SETUP:
-1. Run node.js, Postgres, and
-2. $ psql
-2. $ create table playlist (url varchar(100) NOT NULL CHECK (url <> ''));
-3.
-
-------
+Run node.js and Postgres
+$ psql
+$ create table playlist (url varchar(100) NOT NULL CHECK (url <> ''));
+$ \q
 
 TO RUN LOCALLY:
 $ cd ~/UMQ
 $ npm start (or DEBUG=myapp ./bin/www)
 Go to http://localhost:3000/
 
+TO DEBUG KINDA:
+$ node debug app.js
+
+
+------
+
+HEROKU SETUP:
+$ heroku pg:psql
+$ create table playlist (url varchar(100) NOT NULL CHECK (url <> ''));
+$ \q
+
 TO RUN W/ HEROKU:
 $ git push heroku master
 $ heroku open
-
-
-TO DEBUG KINDA:
-$ node debug app.js

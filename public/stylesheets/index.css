@@ -1,10 +1,9 @@
 #input {
 	width: 50%;
-	margin: 0 0 10px 10px;
+	margin: 0 0 10px 0;
 }
 
 #player {
-
 }
 
 #first {
@@ -12,9 +11,12 @@
 }
 
 #playlist > li {
-	margin-bottom: 5px;
 }
 
 #playlist > li:hover {
 	cursor: pointer;
+}
+
+.container {
+  padding-top: 15px;
 }

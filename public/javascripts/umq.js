@@ -48,42 +48,39 @@ function SetNowPlaying(url) {
 }
 
 function Play(url) {
-	var source = new Youtube(); 		 // determine source
-	var audioURL = source.GetAudio(url); // get input
-	player.loadVideoByUrl(audioURL);     // play it
-	alert("playing track number " + nowPlaying);
+	var source = new Youtube();						// determine source
+	var audioURL = source.GetAudio(url);	// get input
+	player.loadVideoByUrl(audioURL);			// play it
+
+	$('#playlist li').removeClass('active');
+	CurrentTrack().addClass('active');		// highlight now playing
 }
 
 function NextTrack() {
-	var url = $("#playlist li:eq(" + (nowPlaying++) + ")").get(0);
-	return url.innerText;
+	nowPlaying++;
+	return CurrentTrack().text();
+}
+
+function CurrentTrack() {
+	return $("#playlist li:eq(" + (nowPlaying - 1) + ")");
 }
 
 
 ///////////////////////////////////////////////////////////////////////////
 
 $('#playlist > li').click(function (e) {
-	nowPlaying = $(e.target).index() + 1; // set now playing track
+	nowPlaying = $(e.target).index() + 1; // now playing track num
 	Play(e.target.innerText);
 })
 
-$('#input').keyup(function (e) {
-	if (e.originalEvent.keyCode == 13) {
-		$('#add').trigger('click');
-	}
-});
-
 $(function() {
 	$("input").focus();
-
 	// show titles for each URL
 	// $("#playlist > li").each(function (i) {
 	// 	var url = $(this).text();
 	// 	var source = new Youtube();
 	// 	var title = source.GetInfo(url);
-
 	// 	var titleElement = document.createElement('div');
-
 	// 	$(this)[0].appendChild(titleElement);
 	// });
 });
@@ -97,7 +94,10 @@ function onYouTubeIframeAPIReady() {
 	});
 }
 function onPlayerReady(event) {
-	alert("player ready");
+	$('#player').parent().tooltip('show');
+	setTimeout(function() {
+		$('#player').parent().tooltip('destroy');
+	}, 4000);
 }
 function onPlayerStateChange(event) {
 	if (event.data == YT.PlayerState.ENDED) {

@@ -1,24 +1,21 @@
 extends layout
 
 block content
-	form(method='post', action='/playlist')
-		input#input(type='text', name='url' value='')
-		input(type='submit' value='ADD')
+	div.container
+		form(method='post', action='/playlist')
+			input#input(type='text', name='url' value='')
+			input(type='submit' value='ADD')
 
-	h2 PLAYLIST
-	ol#playlist
-		each url in playlist
-			li=url
+		ol#playlist.list-group
+			each url in playlist
+				li.list-group-item=url
 
-	h2 PLAYER
-	div#player
+		div.embed-responsive.embed-responsive-4by3(data-toggle='tooltip', title='Player is ready')
+			div#player
 
-	script(src='https://code.jquery.com/jquery-2.1.3.js')
-	script(src='/javascripts/umq.js')
 
-	| <script type='text/javascript'>
-	| var tag = document.createElement('script');
-	| tag.src = "https://www.youtube.com/iframe_api";
-	| var firstScriptTag = document.getElementsByTagName('script')[0];
-	| firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-	| </script>
+		script(type='text/javascript').
+			var tag = document.createElement('script');
+			tag.src = "https://www.youtube.com/iframe_api";
+			var firstScriptTag = document.getElementsByTagName('script')[0];
+			firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
