@@ -1,60 +1,89 @@
-function Source() {
-	// this.audio;
-	// this.info
-}
-Source.prototype = {
-	GetAudio: function(url) {},
-	GetInfo: function(url) {}
-};
-
-function Youtube() {};
-Youtube.prototype = new Source();
-Youtube.prototype.GetAudio = GetAudioURL;
-Youtube.prototype.GetInfo = SetNowPlaying;
-Youtube.prototype.constructor = Youtube;
-
-var AUTOPLAY = 1;
+var nowPlaying; // number of the track that's playing
 var player;
-var nowPlaying;
 
-///////////////////////////////////////////////////////////////////////////
-
-function GetAudioURL(url) {
-	var video_id = url.split('v=')[1];
-	var ampersandPosition = video_id.indexOf('&');
-	if(ampersandPosition != -1)
-		video_id = video_id.substring(0, ampersandPosition);
-
-	return( "http://www.youtube.com/embed/"+ video_id +"?autoplay=" + AUTOPLAY );
-}
-
-function SetNowPlaying(url) {
-	var dataURL = 'http://gdata.youtube.com/feeds/api/videos/' + url.split('v=')[1] + "?v=2&alt=json";
-	var json = (function() {
-    	var json = null;
-	    $.ajax({
-	        'async': false,
-	        'global': false,
-	        'url': dataURL,
-	        'dataType': "json",
-	        'success': function(data) {
-	            json = data;
-	        }
-	    });
-	    return json;
-    })();
-
-	return json.entry.title.$t
-}
+$('#playlist li').click(function (e) {
+	// if (Play.Success) then
+	nowPlaying = $(e.target).index();
+	Play(e.target.innerText);
+})
 
 function Play(url) {
-	var source = new Youtube();						// determine source
-	var audioURL = source.GetAudio(url);	// get input
-	player.loadVideoByUrl(audioURL);			// play it
+	var source = new Youtube();					// TODO determine source
+	var audioURL = source.GetAudio(url);		// get input
+	source.LoadTrack(audioURL);					// play it
 
 	$('#playlist li').removeClass('active');
-	CurrentTrack().addClass('active');		// highlight now playing
+	CurrentTrack().addClass('active');			// highlight now playing
 }
+
+//TODO global pause and next buttons
+
+function Source() {
+	// this.player = null;
+	this.GetAudio = function(url) {};
+	this.LoadTrack = function(audioURL) {};
+	this.SetupPlayer = function() {};
+	this.GetInfo = function(url) {};
+	// OnStateChange
+	// DetermineSource? in constructor?
+}
+
+function Youtube() {
+	Source.apply(this, arguments);
+
+	this.GetAudio = function(url) {
+		var video_id = url.split('v=')[1];
+		var ampersandPosition = video_id.indexOf('&');
+		if(ampersandPosition != -1)
+			video_id = video_id.substring(0, ampersandPosition);
+		return( "http://www.youtube.com/embed/"+ video_id +"?autoplay=1" );
+	};
+	this.LoadTrack = function(audioURL) {
+		if (typeof(YT) == 'undefined' || typeof(YT.Player) == 'undefined') {
+			window.onYouTubeIframeAPIReady = function() {
+				this.SetupPlayer(audioURL);
+			};
+
+			$.getScript('//www.youtube.com/iframe_api');
+		} else {
+			this.SetupPlayer(audioURL);
+		}
+	};
+	this.GetInfo = function(url) {
+		var dataURL = 'http://gdata.youtube.com/feeds/api/videos/' + url.split('v=')[1] + "?v=2&alt=json";
+		var json = (function() {
+	    	var json = null;
+		    $.ajax({
+		        'async': false,
+		        'global': false,
+		        'url': dataURL,
+		        'dataType': "json",
+		        'success': function(data) {
+		            json = data;
+		        }
+		    });
+		    return json;
+	    })();
+
+		return json.entry.title.$t
+	};
+	this.SetupPlayer = function(audioURL) {
+		if (player) player.destroy();
+		player = new YT.Player('player', {
+			events: {
+				'onReady': function(e) {
+					player.loadVideoByUrl(audioURL);
+				},
+				'onStateChange': function(e) {
+					if (e.data == YT.PlayerState.ENDED) {
+						Play(NextTrack());
+					}
+				}
+			}
+		});
+	};
+};
+Youtube.prototype = new Source();
 
 function NextTrack() {
 	nowPlaying++;
@@ -62,45 +91,5 @@ function NextTrack() {
 }
 
 function CurrentTrack() {
-	return $("#playlist li:eq(" + (nowPlaying - 1) + ")");
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-
-$('#playlist > li').click(function (e) {
-	nowPlaying = $(e.target).index() + 1; // now playing track num
-	Play(e.target.innerText);
-})
-
-$(function() {
-	$("input").focus();
-	// show titles for each URL
-	// $("#playlist > li").each(function (i) {
-	// 	var url = $(this).text();
-	// 	var source = new Youtube();
-	// 	var title = source.GetInfo(url);
-	// 	var titleElement = document.createElement('div');
-	// 	$(this)[0].appendChild(titleElement);
-	// });
-});
-
-function onYouTubeIframeAPIReady() {
-	player = new YT.Player('player', {
-		events: {
-			'onReady': onPlayerReady,
-			'onStateChange': onPlayerStateChange
-		}
-	});
-}
-function onPlayerReady(event) {
-	$('#player').parent().tooltip('show');
-	setTimeout(function() {
-		$('#player').parent().tooltip('destroy');
-	}, 4000);
-}
-function onPlayerStateChange(event) {
-	if (event.data == YT.PlayerState.ENDED) {
-    	Play(NextTrack());
-    }
+	return $("#playlist li:eq(" + nowPlaying + ")");
 }
