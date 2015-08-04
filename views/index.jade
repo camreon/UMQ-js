@@ -3,12 +3,12 @@ extends layout
 block content
 	div.container
 		form(method='post', action='/playlist')
-			input#input(type='text', name='url' value='')
 			input(type='submit' value='ADD')
+			input#input(type='text', name='url' value='')
 
 		ol#playlist.list-group
 			each url in playlist
-				li.list-group-item=url
+				li.list-group-item(data-url=url)=url
 
 		div.embed-responsive.embed-responsive-4by3(data-toggle='tooltip', title='Player is ready')
 			div#player
