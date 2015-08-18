@@ -2,16 +2,20 @@ extends layout
 
 block content
 	div.container
-		form(method='post', action='/playlist')
-			input(type='submit' value='ADD')
-			input#input(type='text', name='url' value='')
+		div.embed-responsive(data-toggle='tooltip')
+			div#player
 
 		ol#playlist.list-group
 			each url in playlist
-				li.list-group-item(data-url=url)=url
+				li.list-group-item(url=url)=url
 
-		div.embed-responsive.embed-responsive-4by3(data-toggle='tooltip', title='Player is ready')
-			div#player
+		form(method='post', action='/playlist')
+			div.row
+				div.col-lg-12
+					div.input-group
+						span.input-group-btn
+							button.btn.btn-default(type='submit') Add
+						input.form-control(type='url', placeholder="Audio URL")
 
 
 		script(type='text/javascript').

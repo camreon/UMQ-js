@@ -1,6 +1,7 @@
 
 function Youtube() {
     Source.apply(this, arguments);
+    var player;
 
     this.GetAudio = function(url) {
         var video_id = url.split('v=')[1];
@@ -44,21 +45,27 @@ function Youtube() {
     };
 
     this.SetupPlayer = function(audioURL) {
-        if (player) player.destroy();
         player = new YT.Player('player', {
-            playerVars: { 'showinfo': 0, 'controls': 0, 'autohide': 1 },
+            playerVars: { showinfo : 0,
+                          autohide : 0,
+                          height   : '50' },
             events: {
                 'onReady': function(e) {
                     player.loadVideoByUrl(audioURL);
                 },
                 'onStateChange': function(e) {
                     if (e.data == YT.PlayerState.ENDED) {
-                        Play(NextTrack());
+                        Play(NextTrack().url);
                     }
                 }
             }
         });
     };
+
+    this.Stop = function() {
+        player.stopVideo();
+        player.destroy();
+    }
 };
 
 Youtube.prototype = new Source();

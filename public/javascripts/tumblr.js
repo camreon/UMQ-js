@@ -1,6 +1,7 @@
-//http://gerogiatehc.tumblr.com/post/118988666373/lentoviolento-art-of-noise-moments-in-love
+
 function Tumblr() {
     Source.apply(this, arguments);
+    var audio;
 
     this.GetAudio = function(url) {
         var audio_id = url.split('?')[0];
@@ -10,28 +11,24 @@ function Tumblr() {
     };
 
     this.LoadTrack = function(audioURL) {
-        var audio = new Audio(audioURL);
+        this.SetupPlayer(audioURL);
         audio.play();
     };
 
     this.GetInfo = function(url) {};
 
     this.SetupPlayer = function(audioURL) {
-        if (player) player.destroy();
-        player = new YT.Player('player', {
-            playerVars: { 'showinfo': 0, 'controls': 0, 'autohide': 1 },
-            events: {
-                'onReady': function(e) {
-                    player.loadVideoByUrl(audioURL);
-                },
-                'onStateChange': function(e) {
-                    if (e.data == YT.PlayerState.ENDED) {
-                        Play(NextTrack());
-                    }
-                }
-            }
-        });
+        audio = $('audio')[0] || document.createElement('audio');
+        audio.src = audioURL;
+        audio.setAttribute("controls", "");
+        if ($('audio').length === 0)
+            $('#player').prepend(audio);
     };
+
+    this.Stop = function() {
+        audio.pause();
+        audio.currentTime = 0;
+    }
 };
 
 Tumblr.prototype = new Source();

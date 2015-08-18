@@ -3,14 +3,8 @@
 	margin: 0 0 10px 0;
 }
 
-#player {
-}
-
-#first {
-	display: block;
-}
-
-#playlist > li {
+#playlist {
+    margin-top: 20px;
 }
 
 #playlist > li:hover {
@@ -19,4 +13,12 @@
 
 .container {
   padding-top: 15px;
+}
+
+.embed-responsive {
+    height: 35px;
+}
+
+audio {
+    width: 100%;
 }

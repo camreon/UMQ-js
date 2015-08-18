@@ -1,11 +1,10 @@
 
 var nowPlaying; // number of the track that's currently playing
-var player;
-
+var source;
 /* get and set track text */
 // $(function() {
 // 	$('#playlist li').each(function() {
-//		var url = $(this).attr('data-url');
+//		var url = $(this).attr('url');
 // 		var source = DetermineSource(url);
 // 		var info = source.GetInfo(url);
 // 		$(this).text(info);
@@ -15,11 +14,14 @@ var player;
 $('#playlist li').click(function (e) {
 	// if (Play.Success) then
 	nowPlaying = $(e.target).index();
-	Play(e.target.getAttribute('data-url'));
+	Play(e.target.getAttribute('url'));
 })
 
+
 function Play(url) {
-	var source = DetermineSource(url);
+	if (source) source.Stop();					// stop last track
+
+	source = DetermineSource(url);
 	var audioURL = source.GetAudio(url);		// get input
 	source.LoadTrack(audioURL);					// play it
 
@@ -29,7 +31,7 @@ function Play(url) {
 
 function NextTrack() {
 	nowPlaying++;
-	return CurrentTrack().text();
+	return CurrentTrack();
 }
 
 function CurrentTrack() {
@@ -43,4 +45,7 @@ function DetermineSource(url)
 	else 							  return null;
 }
 
-//TODO global pause and next buttons
+// TODO display track info
+// TODO soundcloud & bandcamp
+// TODO easier way to add tumblr tracks (chrome extension?)
+// TODO re-ordering
