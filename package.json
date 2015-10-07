@@ -7,7 +7,7 @@
   },
   "dependencies": {
     "body-parser": "~1.8.1",
-    "bootstrap": "^3.3.5",
+    "bootstrap": "~3.3.5",
     "cookie-parser": "~1.3.3",
     "debug": "~2.0.0",
     "express": "~4.9.0",
@@ -15,9 +15,8 @@
     "jquery": "^2.1.4",
     "morgan": "~1.3.0",
     "pg": "~4.3.0",
+    "request": "*",
     "serve-favicon": "~2.1.3",
-    "bootstrap": "~3.3.5",
-    "tumblr": "~0.0.5",
-    "request": "~2.64.0"
+    "tumblr": "^0.4.1"
   }
 }
