@@ -4,7 +4,6 @@ var express = require('express')
   , logger = require('morgan')
   , cookieParser = require('cookie-parser')
   , bodyParser = require('body-parser')
-  , users = require('./routes/users')
   , app = express()
   , pg = require('pg')
   , connectionString = process.env.DATABASE_URL;
@@ -20,19 +19,41 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/users', users);
+
+app.use('/playlist', require('./routes/tumblr_route'));
+
+app.get('/', function (req, res) {
+    pg.connect(connectionString, function (err, client, done) {
+        if (err) next(error(400, 'cant connect to pg'));
+
+        client.query('SELECT * FROM playlist;', function (err, result) {
+            done();
+            if (err) next(error(400, 'cant select'));
+            res.render('index', { playlist: result.rows })
+        });
+    });
+});
+
+// app.delete('/playlist', function (req, res, next) {});
+
+
+// custom error handler
+function error(status, msg) {
+    var err = new Error(msg);
+    err.status = status;
+    return err;
+}
 
 // catch 404 and forward to error handler
-// app.use(function(req, res, next) {
-//     var err = new Error('Not Found');
-//     err.status = 404;
-//     next(err);
-// });
+app.use(function (req, res, next) {
+    var err = new Error('Not Found');
+    err.status = 404;
+    next(err);
+});
 
-// development error handler
-// will print stacktrace
+// development error handler will print stacktrace
 if (app.get('env') === 'development') {
-    app.use(function(err, req, res, next) {
+    app.use(function (err, req, res, next) {
         res.status(err.status || 500);
         res.render('error', {
             message: err.message,
@@ -41,55 +62,13 @@ if (app.get('env') === 'development') {
     });
 }
 
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
+// production error handler w/ no stacktraces leaked to user
+app.use(function (err, req, res, next) {
     res.status(err.status || 500);
     res.render('error', {
         message: err.message,
         error: {}
     });
 });
-
-app.get('/', function(req, res) {
-    var results = [];
-
-    pg.connect(connectionString, function(err, client, done) {
-        query = client.query('SELECT * FROM playlist;');
-        query.on('row', function(row) {
-            results.push(row.url);
-        });
-        query.on('end', function() {
-            client.end();
-            res.render('index', { playlist: results })
-        });
-
-        if (err) { console.log(err); }
-    });
-});
-
-//TODO check if input url is valid before insert
-//TODO add to playlist without reloading page?
-app.post('/playlist', function(req, res) {
-    pg.connect(connectionString, function(err, client, done) {
-        if (req.body.url === "" || req.body.url == null) {
-            res.redirect('/');
-            return;
-        } else {
-            query = client.query('INSERT INTO playlist (url) VALUES($1)',
-                                 [req.body.url]);
-            query.on('end', function() {
-                client.end();
-                res.redirect('/');
-            });
-        }
-        if (err) { console.log(err); }
-    });
-});
-// .put(function(req, res) {
-//   res.send('Update the book');
-// });
-
-//TODO automated import / export
 
 module.exports = app;

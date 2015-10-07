@@ -7,7 +7,7 @@
     margin-top: 20px;
 }
 
-#playlist > li:hover {
+#playlist tr:hover {
 	cursor: pointer;
 }
 
@@ -21,4 +21,8 @@
 
 audio {
     width: 100%;
+}
+
+.add {
+    margin-bottom: 50px;
 }

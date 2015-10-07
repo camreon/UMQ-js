@@ -1,11 +1,18 @@
 # UMQ
 
+## TODO
+* automated import / export
+* socket.io
+
 ## LOCAL SETUP:
 
 Start node.js and Postgres
 ```
 $ psql
-$ create table playlist (url varchar(100) NOT NULL CHECK (url <> ''));
+$ create table playlist (url varchar(255) NOT NULL CHECK (url <> ''),
+                         title varchar(100),
+                         artist varchar(100),
+                         position integer NOT NULL);
 $ \q
 ```
 
@@ -27,8 +34,7 @@ $ node debug app.js
 
 ```
 $ heroku pg:psql
-$ create table playlist (url varchar(100) NOT NULL CHECK (url <> ''));
-$ \q
+$ create above table
 ```
 
 ##### TO RUN W/ HEROKU:
