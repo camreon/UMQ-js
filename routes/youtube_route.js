@@ -3,38 +3,42 @@ var express = require('express')
     , pg = require('pg')
     , uri = require('url')
     , connectionString = process.env.DATABASE_URL
-    , tumblr = require('tumblr.js');
+    , request = require("request");
 
-var tumblr_client = tumblr.createClient({
-    consumer_key: 'yJIWyO77XkRvoRVGDLio6CIIic1jvMY4N1cENVCWlB3Wlwm0bX'
-});
 
 function checkSource(req, res, next) {
     var url = req.body.url;
 
     if (!url) return next(error(400, 'no url'));
-    if (~url.indexOf('tumblr')) {
+    if (~url.indexOf('youtube')) {
         req.url = url;
         next();
     } else
-        next('route');
+        next(error(400, 'unsupported url'));
 }
 
 function parseURL(req, res, next) {
-    req.base_url = uri.parse(req.url).hostname;
-    req.id = uri.parse(req.url).pathname.split('/')[2];
+    var id = req.url.split('v=')[1];
+    var ampersand = id.indexOf('&');
+
+    if(ampersand != -1) req.id = id.substring(0, ampersand);
+    else                req.id = id;
+
     next();
 }
 
 function getInfo(req, res, next) {
-    tumblr_client.posts(req.base_url, { type: 'audio', id: req.id }, function (err, data) {
-        if (err) next(error(400, 'cant reach tumbrl api - ' + err));
+    var info_url = 'http://www.youtube.com/oembed?url=http://www.youtube.com/watch?v='
+                 + req.id + '&format=json';
 
-        var post = data.posts[0];
-        req.track = post.track_name || "";
-        req.artist = post.artist || "";
-        req.audio = post.audio_url;
-        next();
+    request(info_url, function (err, res, body) {
+        if (!err && res.statusCode === 200) {
+            var info = JSON.parse(body);
+            req.title = info.title;
+            req.artist = "";
+
+            next();
+        }
     });
 }
 
@@ -43,7 +47,7 @@ function addToPlaylist(req, res, next) {
         if (err) next(error(400, 'cant connect to db -'  + err));
 
         var query = 'INSERT INTO playlist (position, title, artist, url) VALUES($1, $2, $3, $4)';
-        client.query(query, [0, req.track, req.artist, req.audio], function (err, result) {
+        client.query(query, [0, req.title, req.artist, req.url], function (err, result) {
             done();
             if (err) next(error(400, 'cant insert - ' + err));
             res.redirect('/');

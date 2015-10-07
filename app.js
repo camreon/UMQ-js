@@ -20,21 +20,33 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-app.use('/playlist', require('./routes/tumblr_route'));
-
 app.get('/', function (req, res) {
     pg.connect(connectionString, function (err, client, done) {
-        if (err) next(error(400, 'cant connect to pg'));
+        if (err) next(error(400, 'cant connect to pg - ' + err));
 
         client.query('SELECT * FROM playlist;', function (err, result) {
             done();
-            if (err) next(error(400, 'cant select'));
+            if (err) next(error(400, 'cant select from db - ' + err));
             res.render('index', { playlist: result.rows })
         });
     });
 });
 
-// app.delete('/playlist', function (req, res, next) {});
+app.use('/playlist', require('./routes/tumblr_route'));
+app.use('/playlist', require('./routes/youtube_route'));
+// TODO
+
+app.delete('/playlist', function (req, res, next) {
+    pg.connect(connectionString, function (err, client, done) {
+        if (err) next(error(400, 'cant connect to pg - ' + err));
+
+        client.query('DELETE FROM playlist WHERE id = $1;', [req.body.id], function (err, result) {
+            done();
+            if (err) next(error(400, 'cant delete - ' + err));
+            res.send({redirect: '/'});
+        });
+    });
+});
 
 
 // custom error handler

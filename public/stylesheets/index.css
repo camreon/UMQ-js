@@ -4,15 +4,20 @@
 }
 
 #playlist {
-    margin-top: 20px;
+    background-color: lightgray;
 }
 
-#playlist tr:hover {
-	cursor: pointer;
+#playlist tbody tr:hover {
+    cursor: pointer;
 }
 
 .container {
-  padding-top: 15px;
+    padding-top: 15px;
+}
+
+body {
+    padding-top: 60px;
+    background-color: floralwhite;
 }
 
 .embed-responsive {
@@ -23,6 +28,7 @@ audio {
     width: 100%;
 }
 
-.add {
-    margin-bottom: 50px;
+form.add {
+    margin-bottom: 25px;
 }
+
