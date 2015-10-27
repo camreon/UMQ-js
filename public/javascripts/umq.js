@@ -2,18 +2,6 @@
 var nowPlaying; // number of the track that's currently playing
 var source;
 
-$('#playlist td:first-child').click(function (e) {
-	$.ajax({
-		url: '/playlist',
-		type: 'DELETE',
-		data: 'id=' + $(e.currentTarget).next().text(),
-		success: function(data, textStatus, jqXHR) {
-			window.location = data.redirect;
-		}
-	});
-	return false;
-});
-
 $('#playlist tr').click(function (e) {
 	// if (Play.Success) then
 	nowPlaying = $(e.currentTarget).index() + 1;

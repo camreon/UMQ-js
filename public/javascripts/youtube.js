@@ -55,7 +55,7 @@ function Youtube() {
                 },
                 'onStateChange': function(e) {
                     if (e.data == YT.PlayerState.ENDED) {
-                        Play(NextTrack().url);
+                        Play(NextTrack().attr('url'));
                     }
                 }
             }

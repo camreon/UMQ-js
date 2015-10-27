@@ -3,6 +3,9 @@
 ## TODO
 * automated import / export
 * socket.io
+* search
+* edit info
+
 
 ## LOCAL SETUP:
 

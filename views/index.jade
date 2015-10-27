@@ -19,16 +19,13 @@ block content
 			table#playlist.table.table-bordered.table-hover.table-condensed
 				thead
 					tr
-						th
-						th='id'
-						th='title'
-						th='artist'
-						th='url'
+						th.row-id='id'
+						th.row-title='title'
+						th.row-artist='artist'
+						th.row-url='url'
 				tbody
 					each track in playlist
 						tr(url=track.url)
-							td.btn.btn-danger
-								span.glyphicon.glyphicon-trash
 							td=track.id
 							td=track.title
 							td=track.artist

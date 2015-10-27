@@ -35,7 +35,7 @@ function getInfo(req, res, next) {
         if (!err && res.statusCode === 200) {
             var info = JSON.parse(body);
             req.title = info.title;
-            req.artist = "";
+            req.artist = ""; //TODO
 
             next();
         }

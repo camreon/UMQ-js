@@ -5,7 +5,17 @@
 
 #playlist {
     background-color: lightgray;
+    table-layout: fixed;
 }
+
+#playlist td {
+    overflow: auto;
+}
+.row-delete { width: 30px;  }
+.row-id     { width: 30px;  }
+.row-title  { width: 500px; }
+.row-artist { width: 300px; }
+.row-url    { width: 800px; }
 
 #playlist tbody tr:hover {
     cursor: pointer;
@@ -21,7 +31,7 @@ body {
 }
 
 .embed-responsive {
-    height: 35px;
+    height: 50px;
 }
 
 audio {

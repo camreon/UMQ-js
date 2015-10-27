@@ -34,16 +34,16 @@ app.get('/', function (req, res) {
 
 app.use('/playlist', require('./routes/tumblr_route'));
 app.use('/playlist', require('./routes/youtube_route'));
-// TODO
+app.use('/playlist', require('./routes/bandcamp_route'));
 
-app.delete('/playlist', function (req, res, next) {
+app.get('/delete/:id', function (req, res, next) {
     pg.connect(connectionString, function (err, client, done) {
         if (err) next(error(400, 'cant connect to pg - ' + err));
 
-        client.query('DELETE FROM playlist WHERE id = $1;', [req.body.id], function (err, result) {
+        client.query('DELETE FROM playlist WHERE id = $1;', [req.params.id], function (err, result) {
             done();
             if (err) next(error(400, 'cant delete - ' + err));
-            res.send({redirect: '/'});
+            res.redirect('/');
         });
     });
 });

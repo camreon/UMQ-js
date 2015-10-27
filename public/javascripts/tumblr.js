@@ -29,6 +29,8 @@ function Tumblr() {
         audio.pause();
         audio.currentTime = 0;
     }
+
+    //TODO Play(NextTrack().attr('url')); on state change
 };
 
 Tumblr.prototype = new Source();
