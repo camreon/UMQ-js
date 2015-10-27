@@ -34,7 +34,7 @@ app.get('/', function (req, res) {
 
 app.use('/playlist', require('./routes/tumblr_route'));
 app.use('/playlist', require('./routes/youtube_route'));
-app.use('/playlist', require('./routes/bandcamp_route'));
+// app.use('/playlist', require('./routes/bandcamp_route'));
 
 app.get('/delete/:id', function (req, res, next) {
     pg.connect(connectionString, function (err, client, done) {
