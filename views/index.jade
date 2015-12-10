@@ -1,7 +1,7 @@
 extends layout
 
 block content
-	nav.navbar.navbar-default.navbar-fixed-top
+	nav.navbar.navbar-default.navbar-fixed-bottom
 		div.container
 			div.embed-responsive(data-toggle='tooltip')
 				div#player
@@ -13,23 +13,21 @@ block content
 					div.input-group
 						span.input-group-btn
 							button.btn.btn-default(type='submit') Add
-						input.form-control(type='url', name='url', placeholder="Audio URL")
+						input.form-control(type='url', name='url', placeholder='Audio URL', value='https://alldogs.bandcamp.com/album/georgia' autofocus)
 
 		div.table-responsive
 			table#playlist.table.table-bordered.table-hover.table-condensed
 				thead
 					tr
-						th.row-id='id'
-						th.row-title='title'
-						th.row-artist='artist'
-						th.row-url='url'
+						th.row-id='ID'
+						th.row-title='TITLE'
+						th.row-artist='ARTIST'
 				tbody
 					each track in playlist
-						tr(url=track.url)
-							td=track.id
-							td=track.title
-							td=track.artist
-							td=track.url
+						tr
+							td#id=track.id
+							td(title=track.title)=track.title
+							td(title=track.artist)=track.artist
 
 	script(type='text/javascript').
 		var tag = document.createElement('script');

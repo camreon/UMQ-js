@@ -24,7 +24,7 @@ app.get('/', function (req, res) {
     pg.connect(connectionString, function (err, client, done) {
         if (err) next(error(400, 'cant connect to pg - ' + err));
 
-        client.query('SELECT * FROM playlist;', function (err, result) {
+        client.query('SELECT * FROM playlist ORDER BY id', function (err, result) {
             done();
             if (err) next(error(400, 'cant select from db - ' + err));
             res.render('index', { playlist: result.rows })
@@ -32,15 +32,36 @@ app.get('/', function (req, res) {
     });
 });
 
-app.use('/playlist', require('./routes/tumblr_route'));
 app.use('/playlist', require('./routes/youtube_route'));
-// app.use('/playlist', require('./routes/bandcamp_route'));
+app.use('/playlist', require('./routes/bandcamp_route'));
+app.use('/playlist', require('./routes/tumblr_route'));
+
+
+app.get('/playlist/:id', function (req, res, next) {
+    pg.connect(connectionString, function (err, client, done) {
+        if (err) next(error(400, 'cant connect to db -'  + err));
+
+        var query = 'SELECT url FROM playlist WHERE id = $1';
+        client.query(query, [req.params.id], function (err, result) {
+            done();
+            if (err) next(error(400, 'cant get track - ' + err));
+
+            var track = result.rows[0]; // top 1
+            console.log(track);
+            if (!track) res.send('track not found');
+            res.send(track.url);
+        });
+    });
+});
 
 app.get('/delete/:id', function (req, res, next) {
     pg.connect(connectionString, function (err, client, done) {
         if (err) next(error(400, 'cant connect to pg - ' + err));
 
-        client.query('DELETE FROM playlist WHERE id = $1;', [req.params.id], function (err, result) {
+        var query = 'DELETE FROM playlist WHERE id = $1';
+        if (req.params.id == 0) query = query.replace('=', '!=');
+
+        client.query(query, [req.params.id], function (err, result) {
             done();
             if (err) next(error(400, 'cant delete - ' + err));
             res.redirect('/');

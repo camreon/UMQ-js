@@ -12,10 +12,17 @@
 Start node.js and Postgres
 ```
 $ psql
-$ create table playlist (url varchar(255) NOT NULL CHECK (url <> ''),
-                         title varchar(100),
-                         artist varchar(100),
-                         position integer NOT NULL);
+$ CREATE TABLE playlist (
+    url varchar(255) NOT NULL CHECK (url <> ''),
+    id integer NOT NULL,
+    title varchar(100),
+    artist varchar(100),
+    "position" integer DEFAULT 0 NOT NULL,
+);
+$ ALTER TABLE playlist ADD COLUMN id SERIAL;
+$ UPDATE playlist SET id = DEFAULT;
+$ ALTER TABLE playlist ADD PRIMARY KEY (id);
+
 $ \q
 ```
 

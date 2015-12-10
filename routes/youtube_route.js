@@ -5,25 +5,21 @@ var express = require('express')
     , connectionString = process.env.DATABASE_URL
     , request = require("request");
 
+router.post('/', checkSource, parseURL, getInfo, getAudio, addToPlaylist);
 
 function checkSource(req, res, next) {
-    var url = req.body.url;
-
-    if (!url) return next(error(400, 'no url'));
-    if (~url.indexOf('youtube')) {
-        req.url = url;
+    if (!req.body.url) return next(error(400, 'no url'));
+    if (~req.body.url.indexOf('youtube')) {
         next();
     } else
-        next(error(400, 'unsupported url'));
+        next('route');
+        // next(error(400, 'unsupported url'));
 }
 
 function parseURL(req, res, next) {
+    req.url = req.body.url;
     var id = req.url.split('v=')[1];
-    var ampersand = id.indexOf('&');
-
-    if(ampersand != -1) req.id = id.substring(0, ampersand);
-    else                req.id = id;
-
+    req.id = (~id.indexOf('&')) ? id.substring(0, id.indexOf('&')) : id;
     next();
 }
 
@@ -35,11 +31,17 @@ function getInfo(req, res, next) {
         if (!err && res.statusCode === 200) {
             var info = JSON.parse(body);
             req.title = info.title;
-            req.artist = ""; //TODO
-
+            req.artist = ""; // not provided
             next();
         }
     });
+}
+
+function getAudio(req, res, next) {
+    var video_id = req.url.split('v=')[1]; // TODO use regex
+    if(~video_id.indexOf('&')) video_id = video_id.substring(0, video_id.indexOf('&'));
+    req.url = "http://www.youtube.com/v/"+ video_id +"?autoplay=1";
+    next();
 }
 
 function addToPlaylist(req, res, next) {
@@ -54,9 +56,6 @@ function addToPlaylist(req, res, next) {
         });
     });
 }
-
-router.post('/', checkSource, parseURL, getInfo, addToPlaylist);
-
 
 // custom error handler
 function error(status, msg) {
