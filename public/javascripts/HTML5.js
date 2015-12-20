@@ -1,5 +1,5 @@
 
-function Tumblr() {
+function HTML5() {
     Source.apply(this, arguments);
     var audio;
 
@@ -14,14 +14,13 @@ function Tumblr() {
         audio.setAttribute("controls", ""); // play/pause buttons
 
         if ($('audio').length === 0) $('#player').prepend(audio);
+        $('audio').on("ended", Play(NextTrack()));
     };
 
     this.Stop = function() {
         audio.pause();
         audio.currentTime = 0;
     }
-
-    //TODO Play(NextTrack().attr('url')); on state change
 };
 
-Tumblr.prototype = new Source();
+HTML5.prototype = new Source();

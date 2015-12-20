@@ -1,3 +1,7 @@
+// TODO data access (API) layer
+//      data models
+//
+
 var express = require('express')
   , path = require('path')
   , favicon = require('serve-favicon')
@@ -41,15 +45,19 @@ app.get('/playlist/:id', function (req, res, next) {
     pg.connect(connectionString, function (err, client, done) {
         if (err) next(error(400, 'cant connect to db -'  + err));
 
+        var id = req.params.id;
         var query = 'SELECT url FROM playlist WHERE id = $1';
-        client.query(query, [req.params.id], function (err, result) {
+        client.query(query, [id], function (err, result) {
             done();
-            if (err) next(error(400, 'cant get track - ' + err));
+            if (err) next(error(400, 'db error for track #'+id+' - '+err));
+            if (!result) next(error(404, 'no result for track#'+id));
 
+            console.log(result);
             var track = result.rows[0]; // top 1
-            console.log(track);
-            if (!track) res.send('track not found');
-            res.send(track.url);
+            if (!track)
+                res.send('track #'+id+' doesnt exist');
+            else
+                res.send(track.url);
         });
     });
 });

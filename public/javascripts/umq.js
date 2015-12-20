@@ -4,22 +4,31 @@ var source;
 
 $('#playlist tr').click(function (e) {
 	nowPlaying = $(e.currentTarget).index() + 1;
-
-	var id = $(this).find('#id').html();
-	$.get('playlist/' + id, function(url) {
-		var u = url;
-		Play(u);
-	});
+	Play(CurrentTrack());
 });
 
 
 function Play(url) {
 	if (source) source.Stop();				// stop last track
-	source = DetermineSource(url);
+	DetermineSource(url);
 	source.LoadTrack(url);					// play it
+	MarkCurrentTrack();
+}
+
+function MarkCurrentTrack() {
+	var track = $("#playlist tr:eq("+nowPlaying+")");
 
 	$('#playlist tr').removeClass('success');
-	CurrentTrack().addClass('success');		// highlight now playing
+	track.addClass('success');
+}
+
+function CurrentTrack() {
+	var track = $("#playlist tr:eq("+nowPlaying+")");
+	var id = track.find('#id').html();
+
+	$.get('playlist/' + id, function(url) {
+		return url; // TODO promise
+	});
 }
 
 function NextTrack() {
@@ -27,16 +36,12 @@ function NextTrack() {
 	return CurrentTrack();
 }
 
-function CurrentTrack() {
-	return $("#playlist tr:eq(" + nowPlaying + ")");
-}
-
 function DetermineSource(url)
 {
-	if 		(~url.indexOf('youtube')) return new Youtube();
-	// else if (~url.indexOf('tumblr'))  return new Tumblr();
+	if (~url.indexOf('youtube')) source = new Youtube();
+	// else if (~url.indexOf('tumblr')) return new Tumblr();
 	else {
-		return new Tumblr();
+		source = new HTML5();
 		// console.log('invalid audio source');
 		// return null;
 	}
