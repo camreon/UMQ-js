@@ -8,27 +8,27 @@ $('#playlist tr').click(function (e) {
 });
 
 
-function Play(url) {
-	if (source) source.Stop();				// stop last track
-	DetermineSource(url);
-	source.LoadTrack(url);					// play it
-	MarkCurrentTrack();
+function Play(track) {
+	var id = track.find('#id').html();
+	$.get('playlist/' + id)
+		.done(function(url) {
+			if (source) source.Stop();
+			DetermineSource(url);
+			source.LoadTrack(url);
+			Highlight(track);
+		})
+		.fail(function() {
+			console.log('url for track #'+id+' not found');
+		});
 }
 
-function MarkCurrentTrack() {
-	var track = $("#playlist tr:eq("+nowPlaying+")");
-
+function Highlight(track) {
 	$('#playlist tr').removeClass('success');
 	track.addClass('success');
 }
 
 function CurrentTrack() {
-	var track = $("#playlist tr:eq("+nowPlaying+")");
-	var id = track.find('#id').html();
-
-	$.get('playlist/' + id, function(url) {
-		return url; // TODO promise
-	});
+	return $("#playlist tr:eq("+nowPlaying+")");
 }
 
 function NextTrack() {

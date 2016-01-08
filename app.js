@@ -49,15 +49,16 @@ app.get('/playlist/:id', function (req, res, next) {
         var query = 'SELECT url FROM playlist WHERE id = $1';
         client.query(query, [id], function (err, result) {
             done();
-            if (err) next(error(400, 'db error for track #'+id+' - '+err));
-            if (!result) next(error(404, 'no result for track#'+id));
-
-            console.log(result);
-            var track = result.rows[0]; // top 1
-            if (!track)
-                res.send('track #'+id+' doesnt exist');
-            else
-                res.send(track.url);
+            // if (err) {
+                // next(error(400, 'db error retrieving track #'+id+' - '+err));
+            // }
+            if (err || result == undefined) {
+                next(error(404, 'no result for track #'+id));
+            }
+            else {
+                var track = result.rows[0]; // top 1
+                res.send(track ? track.url : 'track #'+id+' doesnt exist');
+            }
         });
     });
 });
@@ -80,6 +81,7 @@ app.get('/delete/:id', function (req, res, next) {
 
 // custom error handler
 function error(status, msg) {
+    console.log(msg);
     var err = new Error(msg);
     err.status = status;
     return err;
