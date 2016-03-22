@@ -29,14 +29,17 @@ $ \q
 ##### TO RUN LOCALLY:
 ```
 $ cd ~/UMQ
-$ npm start (or DEBUG=myapp ./bin/www)
+$ nodemon
+$ (or npm start)
 ```
 Go to http://localhost:3000/
 
 
-##### TO DEBUG KINDA:
+##### TO DEBUG:
 ```
-$ node debug app.js
+$ node-debug app.js
+$ (or DEBUG=express:* node ./bin/www)
+$ (or node debug app.js)
 ```
 
 

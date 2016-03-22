@@ -40,7 +40,6 @@ app.use('/playlist', require('./routes/youtube_route'));
 app.use('/playlist', require('./routes/bandcamp_route'));
 app.use('/playlist', require('./routes/tumblr_route'));
 
-
 app.get('/playlist/:id', function (req, res, next) {
     pg.connect(connectionString, function (err, client, done) {
         if (err) next(error(400, 'cant connect to db -'  + err));

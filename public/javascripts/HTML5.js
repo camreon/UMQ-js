@@ -4,17 +4,16 @@ function HTML5() {
     var audio;
 
     this.LoadTrack = function(audioURL) {
-        this.SetupPlayer(audioURL);
-        audio.play();
-    };
-
-    this.SetupPlayer = function(audioURL) {
         audio = $('audio')[0] || document.createElement('audio');
         audio.src = audioURL;
         audio.setAttribute("controls", ""); // play/pause buttons
 
-        if ($('audio').length === 0) $('#player').prepend(audio);
-        $('audio').on("ended", Play(NextTrack()));
+        if ($('audio').length === 0) {
+            $('#player').prepend(audio);
+            $('audio').bind("ended", Play(NextTrack())); // first load fires this event
+        }
+
+        audio.play();
     };
 
     this.Stop = function() {

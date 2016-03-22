@@ -7,36 +7,45 @@ var express = require('express')
     , connectionString = process.env.DATABASE_URL;
 
 
-router.post('/', checkSource, getInfo, getAudio, addToPlaylist);
+router.post('/', [checkSource, getInfo, getAudio, addToPlaylist]);
 
 function checkSource(req, res, next) {
     if (!req.body.url) return next(error(400, 'no url'));
-    if (~req.body.url.indexOf('bandcamp')) next();
+    else if (~req.body.url.indexOf('bandcamp')) next();
+    else if (~req.body.url.indexOf('bcbits') || ~req.body.url.indexOf('popplers5')) {
+        req.title = req.body.url;
+        req.artist = "";
+        req.url = req.body.url;
+        next();
+    }
     else next('route');
-        // next(error(400, 'unsupported url'));
 }
 
 function getInfo(req, res, next) {
-    request(req.body.url, function (err, res, html) {
-        if (!err && res.statusCode === 200) {
-            var data_name = 'var TralbumData';
-            var $ = cheerio.load(html);
+    if (req.url.length <= 1) {
+        request(req.body.url, function (err, res, html) {
+            if (!err && res.statusCode === 200) {
+                var data_name = 'var TralbumData';
+                var $ = cheerio.load(html);
 
-            var script = $('script').filter(function () {
-                return (~$(this).text().indexOf(data_name));
-            });
+                var script = $('script').filter(function () {
+                    return (~$(this).text().indexOf(data_name));
+                });
 
-            var text = script.text();
-            var album = extractJSON(data_name, text);
-            req.track = album.trackinfo[0]; // TODO add multiple tracks from album
-
-            req.title = req.track.title || '';
-            req.artist = album.artist || '';
+                var text = script.text();
+                var album = extractJSON(data_name, text);
+                req.track = album.trackinfo[0]; // TODO add multiple tracks from album
+                req.title = req.track.title || '';
+                req.artist = album.artist || '';
+            }
             next();
-        } else {
-            next(error(404, err));
-        }
-    });
+            // } else {
+            //     next(error(404, err));
+            // }
+        });
+    } else {
+        next();
+    }
 }
 
 function extractJSON(json_name, text) {
@@ -46,12 +55,15 @@ function extractJSON(json_name, text) {
 }
 
 function getAudio(req, res, next) {
-    req.url = req.track.file['mp3-128'];
-    if (!req.url) next(error(400, 'cant get audio for ' + req.body.url));
+    if (req.track != undefined && req.track.file != undefined)
+        req.url = req.track.file['mp3-128'];
+
+    if (!req.url || req.url.length <= 1) next(error(400, 'cant get audio for ' + req.body.url));
     next();
 }
 
 function addToPlaylist(req, res, next) {
+    console.log('Adding to playlist:\n track name: %s\n url:%s', req.title, req.url);
     pg.connect(connectionString, function (err, client, done) {
         if (err) next(error(400, 'cant connect to db -'  + err));
 

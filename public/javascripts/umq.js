@@ -10,16 +10,20 @@ $('#playlist tr').click(function (e) {
 
 function Play(track) {
 	var id = track.find('#id').html();
-	$.get('playlist/' + id)
-		.done(function(url) {
-			if (source) source.Stop();
-			DetermineSource(url);
-			source.LoadTrack(url);
-			Highlight(track);
-		})
-		.fail(function() {
-			console.log('url for track #'+id+' not found');
-		});
+	if (id == undefined) 
+		console.log('track id:', id);
+	else {
+		$.get('playlist/' + id)
+			.done(function(url) {
+				if (source) source.Stop();
+				DetermineSource(url);
+				source.LoadTrack(url);
+				Highlight(track);
+			})
+			.fail(function() {
+				console.log('url for track #'+id+' not found');
+			});
+	}
 }
 
 function Highlight(track) {
