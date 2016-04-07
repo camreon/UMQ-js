@@ -10,7 +10,7 @@ $('#playlist tr').click(function (e) {
 
 function Play(track) {
 	var id = track.find('#id').html();
-	if (id == undefined) 
+	if (id == undefined)
 		console.log('track id:', id);
 	else {
 		$.get('playlist/' + id)
@@ -43,10 +43,9 @@ function NextTrack() {
 function DetermineSource(url)
 {
 	if (~url.indexOf('youtube')) source = new Youtube();
-	// else if (~url.indexOf('tumblr')) return new Tumblr();
 	else {
 		source = new HTML5();
 		// console.log('invalid audio source');
-		// return null;
+		// source = null;
 	}
 }

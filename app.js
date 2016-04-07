@@ -1,6 +1,6 @@
-// TODO data access (API) layer
-//      data models
-//
+// TODO - data access (API) layer
+//      - class models
+//      - generic source route
 
 var express = require('express')
   , path = require('path')
@@ -36,9 +36,11 @@ app.get('/', function (req, res) {
     });
 });
 
-app.use('/playlist', require('./routes/youtube_route'));
-app.use('/playlist', require('./routes/bandcamp_route'));
-app.use('/playlist', require('./routes/tumblr_route'));
+app.use('/playlist', [
+    require('./routes/youtube_route'),
+    require('./routes/bandcamp_route'),
+    require('./routes/tumbrl_route')
+]);
 
 app.get('/playlist/:id', function (req, res, next) {
     pg.connect(connectionString, function (err, client, done) {
@@ -48,9 +50,6 @@ app.get('/playlist/:id', function (req, res, next) {
         var query = 'SELECT url FROM playlist WHERE id = $1';
         client.query(query, [id], function (err, result) {
             done();
-            // if (err) {
-                // next(error(400, 'db error retrieving track #'+id+' - '+err));
-            // }
             if (err || result == undefined) {
                 next(error(404, 'no result for track #'+id));
             }
@@ -88,7 +87,7 @@ function error(status, msg) {
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-    var err = new Error('Not Found');
+    var err = new Error('not found')
     err.status = 404;
     next(err);
 });
@@ -103,7 +102,6 @@ if (app.get('env') === 'development') {
         });
     });
 }
-
 // production error handler w/ no stacktraces leaked to user
 app.use(function (err, req, res, next) {
     res.status(err.status || 500);

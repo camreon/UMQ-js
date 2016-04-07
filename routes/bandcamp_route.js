@@ -7,13 +7,14 @@ var express = require('express')
     , connectionString = process.env.DATABASE_URL;
 
 
-router.post('/', [checkSource, getInfo, getAudio, addToPlaylist]);
+router.post('/', checkSource, getInfo, getAudio, addToPlaylist);
 
 function checkSource(req, res, next) {
-    if (!req.body.url) return next(error(400, 'no url'));
+    if (!req.body.url) next(error(400, 'no url'));
     else if (~req.body.url.indexOf('bandcamp')) next();
-    else if (~req.body.url.indexOf('bcbits') || ~req.body.url.indexOf('popplers5')) {
-        req.title = req.body.url;
+    else if (~req.body.url.indexOf('popplers5')) {
+       // || ~req.body.url.indexOf('bcbits')
+        req.title = "";
         req.artist = "";
         req.url = req.body.url;
         next();
@@ -32,16 +33,12 @@ function getInfo(req, res, next) {
                     return (~$(this).text().indexOf(data_name));
                 });
 
-                var text = script.text();
-                var album = extractJSON(data_name, text);
-                req.track = album.trackinfo[0]; // TODO add multiple tracks from album
+                var album = extractJSON(data_name, script.text());
+                req.track = album.trackinfo[0]; // TODO: add multiple tracks from album
                 req.title = req.track.title || '';
                 req.artist = album.artist || '';
             }
             next();
-            // } else {
-            //     next(error(404, err));
-            // }
         });
     } else {
         next();
@@ -51,7 +48,7 @@ function getInfo(req, res, next) {
 function extractJSON(json_name, text) {
     text = text.substr(text.indexOf(json_name));
     text = text.substring(text.indexOf('{'), text.indexOf(';'));
-    return eval("(" + text + ")");
+    return eval("(" + text + ")"); // lol
 }
 
 function getAudio(req, res, next) {
@@ -71,13 +68,14 @@ function addToPlaylist(req, res, next) {
         client.query(query, [0, req.title, req.artist, req.url], function (err, result) {
             done();
             if (err) next(error(400, 'cant insert - ' + err));
-            res.redirect('/');
+            res.status(200).redirect('/');
         });
     });
 }
 
 // custom error handler
 function error(status, msg) {
+    console.log(msg);
     var err = new Error(msg);
     err.status = status;
     return err;
