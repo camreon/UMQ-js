@@ -2,7 +2,8 @@ var express = require('express')
     , router = express.Router()
     , uri = require('url')
     , request = require("request")
-    , db = require('monkii')('localhost/umq')
+    , mongo_uri = process.env.MONGOLAB_URI || 'localhost/umq'
+    , db = require('monkii')(mongo_uri)
     , playlist = db.get('playlist');
 
 router.post('/', checkSource, getInfo, getAudio, addToPlaylist);

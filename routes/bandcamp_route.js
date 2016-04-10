@@ -3,7 +3,8 @@ var express = require('express')
     , request = require('request')
     , cheerio = require('cheerio')
     , json_minify = require('node-json-minify')
-    , db = require('monkii')('localhost/umq')
+    , mongo_uri = process.env.MONGOLAB_URI || 'localhost/umq'
+    , db = require('monkii')(mongo_uri)
     , playlist = db.get('playlist')
     , autoIncrement = require("mongodb-autoincrement");
 

@@ -9,7 +9,8 @@ var express = require('express')
   , cookieParser = require('cookie-parser')
   , bodyParser = require('body-parser')
   , app = express()
-  , db = require('monkii')('localhost/umq')
+  , mongo_uri = process.env.MONGOLAB_URI || 'localhost/umq'
+  , db = require('monkii')(mongo_uri)
   , playlist = db.get('playlist');
 
 // view engine setup
