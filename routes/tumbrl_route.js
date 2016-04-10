@@ -1,12 +1,12 @@
 var express = require('express')
     , router = express.Router()
-    , pg = require('pg')
     , uri = require('url')
-    , connectionString = process.env.DATAblog
-    , tumbrl = require('tumblr.js');
+    , tumbrl = require('tumblr.js')
+    , db = require('monkii')('localhost/umq')
+    , playlist = db.get('playlist');
 
 var tumbrl_client = tumbrl.createClient({
-    consumer_key: ''
+    consumer_key: '' // https://www.tumblr.com/oauth/apps
 });
 
 router.post('/', checkSource, getInfo, getAudio, addToPlaylist);
@@ -14,13 +14,13 @@ router.post('/', checkSource, getInfo, getAudio, addToPlaylist);
 // TODO: move to generic source route
 function checkSource(req, res, next) {
     if (!req.body.url) next(error(400, 'no url'));
-    else if (~req.body.url.indexOf('a.tumbrl')) {
+    else if (~req.body.url.indexOf('a.tumblr')) {
         req.title = '';
         req.artist = '';
         req.url = req.body.url;
         next(); //should skip to addToPlaylist
     }
-    else if (~req.body.url.indexOf('tumbrl')) {
+    else if (~req.body.url.indexOf('tumblr')) {
         next();
     } else {
         next(error(400, 'unsupported url'));
@@ -51,23 +51,21 @@ function getAudio(req, res, next) {
     var audio_id = req.url.split('?')[0];
     if (~audio_id.lastIndexOf('/')) {
         audio_id = audio_id.substring(audio_id.lastIndexOf('/') + 1);
-        req.url = 'http://a.tumbrl.com/'+ audio_id +'o1.mp3';
+        req.url = 'http://a.tumblr.com/'+ audio_id +'o1.mp3';
     }
     next();
 }
 
 // TODO: move to generic source route
 function addToPlaylist(req, res, next) {
-    console.log('Adding to playlist:\n track name: %s\n url:%s', req.title, req.url);
-    pg.connect(connectionString, function (err, client, done) {
-        if (err) next(error(400, 'cant connect to db -'  + err));
-
-        var query = 'INSERT INTO playlist (position, title, artist, url) VALUES($1, $2, $3, $4)';
-        client.query(query, [0, req.title, req.artist, req.url], function (err, result) {
-            done();
-            if (err) next(error(400, 'cant insert - ' + err));
-            res.status(200).redirect('/');
-        });
+    console.log('Adding to playlist:\n track name: %s\n url: %s', req.title, req.url);
+    playlist.insert({
+        title: req.title,
+        artist: req.artist,
+        url: req.url,
+    }, function(err, doc) {
+        if (err) next(error(400, 'cant insert - ' + err));
+        res.status(200).redirect('/');
     });
 }
 

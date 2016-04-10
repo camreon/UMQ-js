@@ -9,28 +9,16 @@
 
 ## LOCAL SETUP:
 
-Start node.js and Postgres
+Start nodejs and mongodb
 ```
-$ psql
-$ CREATE TABLE playlist (
-    url varchar(255) NOT NULL CHECK (url <> ''),
-    id integer NOT NULL,
-    title varchar(100),
-    artist varchar(100),
-    "position" integer DEFAULT 0 NOT NULL,
-);
-$ ALTER TABLE playlist ADD COLUMN id SERIAL;
-$ UPDATE playlist SET id = DEFAULT;
-$ ALTER TABLE playlist ADD PRIMARY KEY (id);
-
-$ \q
+$ mongod
+$ mongoimport --db umq --collection playlist --drop --file test_playlist.json
 ```
 
 ##### TO RUN LOCALLY:
 ```
 $ cd ~/UMQ
-$ nodemon
-$ (or npm start)
+$ nodemon (or npm start)
 ```
 Go to http://localhost:3000/
 
@@ -46,8 +34,8 @@ $ (or node debug app.js)
 ## HEROKU SETUP:
 
 ```
-$ heroku pg:psql
-$ create above table
+$ mongo ds019960.mlab.com:19960/heroku_6k49cpxd -u <username> -p <password>
+$ mongoimport -h ds019960.mlab.com:19960 -d heroku_6k49cpxd -c playlist -u <username> -p <password> --file test_playlist.json
 ```
 
 ##### TO RUN W/ HEROKU:

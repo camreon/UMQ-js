@@ -9,8 +9,8 @@ var express = require('express')
   , cookieParser = require('cookie-parser')
   , bodyParser = require('body-parser')
   , app = express()
-  , pg = require('pg')
-  , connectionString = process.env.DATABASE_URL;
+  , db = require('monkii')('localhost/umq')
+  , playlist = db.get('playlist');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -25,14 +25,23 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.get('/', function (req, res) {
-    pg.connect(connectionString, function (err, client, done) {
-        if (err) next(error(400, 'cant connect to pg - ' + err));
+    var tracks = playlist.find({}, function (err, docs){
+        res.render('index', { playlist: docs });
+    });
+});
 
-        client.query('SELECT * FROM playlist ORDER BY id', function (err, result) {
-            done();
-            if (err) next(error(400, 'cant select from db - ' + err));
-            res.render('index', { playlist: result.rows })
-        });
+app.get('/playlist/:id', function (req, res, next) {
+    playlist.find({ _id: req.params.id }, function(err, doc) {
+        if (err) next(error(404, 'no result for track #' + id));
+        var track = doc[0];
+        res.send(track ? track.url : 'track #' + id + ' doesnt exist');
+    });
+});
+
+app.get('/delete/:id', function (req, res, next) {
+    playlist.remove({ _id: req.params.id }, function(err) {
+        if (err) next(error(400, 'cant delete - ' + err));
+        res.redirect('/');
     });
 });
 
@@ -41,40 +50,6 @@ app.use('/playlist', [
     require('./routes/bandcamp_route'),
     require('./routes/tumbrl_route')
 ]);
-
-app.get('/playlist/:id', function (req, res, next) {
-    pg.connect(connectionString, function (err, client, done) {
-        if (err) next(error(400, 'cant connect to db -'  + err));
-
-        var id = req.params.id;
-        var query = 'SELECT url FROM playlist WHERE id = $1';
-        client.query(query, [id], function (err, result) {
-            done();
-            if (err || result == undefined) {
-                next(error(404, 'no result for track #'+id));
-            }
-            else {
-                var track = result.rows[0]; // top 1
-                res.send(track ? track.url : 'track #'+id+' doesnt exist');
-            }
-        });
-    });
-});
-
-app.get('/delete/:id', function (req, res, next) {
-    pg.connect(connectionString, function (err, client, done) {
-        if (err) next(error(400, 'cant connect to pg - ' + err));
-
-        var query = 'DELETE FROM playlist WHERE id = $1';
-        if (req.params.id == 0) query = query.replace('=', '!=');
-
-        client.query(query, [req.params.id], function (err, result) {
-            done();
-            if (err) next(error(400, 'cant delete - ' + err));
-            res.redirect('/');
-        });
-    });
-});
 
 
 // custom error handler

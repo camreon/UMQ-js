@@ -1,10 +1,11 @@
 var express = require('express')
     , router = express.Router()
-    , pg = require('pg')
     , request = require('request')
     , cheerio = require('cheerio')
     , json_minify = require('node-json-minify')
-    , connectionString = process.env.DATABASE_URL;
+    , db = require('monkii')('localhost/umq')
+    , playlist = db.get('playlist')
+    , autoIncrement = require("mongodb-autoincrement");
 
 
 router.post('/', checkSource, getInfo, getAudio, addToPlaylist);
@@ -60,16 +61,14 @@ function getAudio(req, res, next) {
 }
 
 function addToPlaylist(req, res, next) {
-    console.log('Adding to playlist:\n track name: %s\n url:%s', req.title, req.url);
-    pg.connect(connectionString, function (err, client, done) {
-        if (err) next(error(400, 'cant connect to db -'  + err));
-
-        var query = 'INSERT INTO playlist (position, title, artist, url) VALUES($1, $2, $3, $4)';
-        client.query(query, [0, req.title, req.artist, req.url], function (err, result) {
-            done();
-            if (err) next(error(400, 'cant insert - ' + err));
-            res.status(200).redirect('/');
-        });
+    console.log('Adding to playlist:\n track name: %s\n url: %s', req.title, req.url);
+    playlist.insert({
+        title: req.title,
+        artist: req.artist,
+        url: req.url,
+    }, function(err, doc) {
+        if (err) next(error(400, 'cant insert - ' + err));
+        res.status(200).redirect('/');
     });
 }
 
