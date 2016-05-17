@@ -1,10 +1,7 @@
 # UMQ
 
-## TODO
-* automated import / export
-* socket.io
-* search
-* edit info
+## DEMO: 
+http://umq.herokuapp.com/
 
 
 ## LOCAL SETUP:
@@ -43,3 +40,9 @@ $ mongoimport -h ds019960.mlab.com:19960 -d heroku_6k49cpxd -c playlist -u <user
 $ git push heroku master
 $ heroku open
 ```
+
+## TODO
+* automated import / export
+* socket.io
+* search
+* edit info
