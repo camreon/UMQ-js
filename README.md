@@ -12,13 +12,17 @@ $ mongod
 $ mongoimport --db umq --collection playlist --drop --file test_playlist.json
 ```
 
-##### TO RUN LOCALLY:
+##### LOCAL DEPLOY:
 ```
 $ cd ~/UMQ
 $ nodemon (or npm start)
 ```
 Go to http://localhost:3000/
 
+##### TO TEST:
+```
+$ mocha
+```
 
 ##### TO DEBUG:
 ```
@@ -35,7 +39,7 @@ $ mongo ds019960.mlab.com:19960/heroku_6k49cpxd -u <username> -p <password>
 $ mongoimport -h ds019960.mlab.com:19960 -d heroku_6k49cpxd -c playlist -u <username> -p <password> --file test_playlist.json
 ```
 
-##### TO RUN W/ HEROKU:
+##### HEROKU DEPLOY:
 ```
 $ git push heroku master
 $ heroku open
