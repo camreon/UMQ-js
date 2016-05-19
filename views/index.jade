@@ -12,8 +12,8 @@ block content
 				div.col-lg-12
 					div.input-group
 						span.input-group-btn
-							button.btn.btn-default(type='submit') Add
-						input.form-control(type='url', name='url', placeholder='Audio URL', autofocus)
+							button.btn.btn-default(type='submit') Add URL
+						input.form-control(type='url', name='url', placeholder='supports youtube, bandcamp, and tumblr audio', autofocus)
 
 		div.table-responsive
 			table#playlist.table.table-bordered.table-hover.table-condensed
@@ -25,7 +25,8 @@ block content
 				tbody
 					each track in playlist
 						tr
-							td#id=track._id
+							td.hideChild
+								p#id=track._id
 							td(title=track.title)=track.title
 							td(title=track.artist)=track.artist
 

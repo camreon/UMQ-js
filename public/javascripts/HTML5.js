@@ -12,7 +12,7 @@ function HTML5() {
             $('#player').prepend(audio);
             $('audio').bind("ended", Play(NextTrack())); // first load fires this event
         }
-
+        
         audio.play();
     };
 

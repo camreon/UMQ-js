@@ -1,7 +1,3 @@
-// TODO - data access (API) layer
-//      - class models
-//      - generic source route
-
 var express = require('express')
   , path = require('path')
   , favicon = require('serve-favicon')
@@ -12,6 +8,12 @@ var express = require('express')
   , mongo_uri = process.env.MONGOLAB_URI || 'localhost/umq'
   , db = require('monkii')(mongo_uri)
   , playlist = db.get('playlist');
+
+var sources = [
+      require('./sources/youtube')
+    , require('./sources/bandcamp')
+    , require('./sources/tumbrl')
+];
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -26,6 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.get('/', function (req, res) {
+    // order by id or timestamp?
     var tracks = playlist.find({}, function (err, docs){
         res.render('index', { playlist: docs });
     });
@@ -40,18 +43,39 @@ app.get('/playlist/:id', function (req, res, next) {
 });
 
 app.get('/delete/:id', function (req, res, next) {
-    playlist.remove({ _id: req.params.id }, function(err) {
+    var query = { _id: req.params.id };
+    if (req.params.id == 'all')
+        query = {};
+    playlist.remove(query, function(err) {
         if (err) next(error(400, 'cant delete - ' + err));
         res.redirect('/');
     });
 });
 
-app.use('/playlist', [
-    require('./routes/youtube_route'),
-    require('./routes/bandcamp_route'),
-    require('./routes/tumbrl_route')
-]);
+sources.forEach(function(src) {
+    app.post('/playlist', src.check, src.info, src.audio, addToPlaylist);
+});
 
+app.post('/playlist', function(req, res, next) {
+    next(error(400, 'unsupported url'));
+});
+
+
+function addToPlaylist(req, res, next) {
+    if (req.url.length < 10)
+        next(error(400, 'invalid audio URL: ' + req.url));
+    else {
+        playlist.insert({
+            title: req.title,
+            artist: req.artist,
+            url: req.url,
+        }, function(err, doc) {
+            if (err) next(error(400, 'cant insert - ' + err));
+            console.log('Added to playlist:\n track name: %s\n url: %s', req.title, req.url);
+            res.status(200).redirect('/');
+        });
+    }
+}
 
 // custom error handler
 function error(status, msg) {

@@ -11,7 +11,7 @@ $('#playlist tr').click(function (e) {
 function Play(track) {
 	var id = track.find('#id').html();
 	if (id == undefined)
-		console.log('track id:', id);
+		console.log('track id:', id, 'is invalid');
 	else {
 		$.get('playlist/' + id)
 			.done(function(url) {
