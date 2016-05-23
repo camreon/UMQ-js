@@ -5,7 +5,7 @@ var express = require('express')
   , cookieParser = require('cookie-parser')
   , bodyParser = require('body-parser')
   , app = express()
-  , mongo_uri = process.env.MONGOLAB_URI || 'localhost/umq'
+  , mongo_uri = process.env.MONGOLAB_URI
   , db = require('monkii')(mongo_uri)
   , playlist = db.get('playlist');
 
@@ -28,8 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.get('/', function (req, res) {
-    // order by id or timestamp?
-    var tracks = playlist.find({}, function (err, docs){
+    var tracks = playlist.find({}, {sort: {_id: 1}}, function (err, docs){
         res.render('index', { playlist: docs });
     });
 });
@@ -52,6 +51,7 @@ app.get('/delete/:id', function (req, res, next) {
     });
 });
 
+// dynamically create routes
 sources.forEach(function(src) {
     app.post('/playlist', src.check, src.info, src.audio, addToPlaylist);
 });

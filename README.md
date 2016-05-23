@@ -1,10 +1,12 @@
-# UMQ
+# UMQ (Universal Media Queuer)
 
-## DEMO: 
+## DEMO:
 http://umq.herokuapp.com/
 
 
 ## LOCAL SETUP:
+
+Create .env file with mongodb conn string
 
 Start nodejs and mongodb
 ```
@@ -15,9 +17,9 @@ $ mongoimport --db umq --collection playlist --drop --file test_playlist.json
 ##### LOCAL DEPLOY:
 ```
 $ cd ~/UMQ
-$ nodemon (or npm start)
+$ heroku local web (which runs nodemon from the Procfile)
 ```
-Go to http://localhost:3000/
+Go to http://localhost:5000/
 
 ##### TO TEST:
 ```

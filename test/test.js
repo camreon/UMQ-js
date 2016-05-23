@@ -16,7 +16,7 @@ describe('add to playlist', function() {
         { type: 'invalid url',       url: 'xxx' }
     ];
 
-    var host_url = 'http://localhost:3000'
+    var host_url = 'http://localhost:5000'
     var app = request.agent(host_url);
 
     tests.forEach(function(test) {
