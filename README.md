@@ -1,6 +1,7 @@
-```
-NOTE: This repo is the original version. Use https://github.com/camreon/UMQ instead.
-```
+
+### NOTE: This repo is the original version. Use [https://github.com/camreon/UMQ](https://github.com/camreon/UMQ) instead.
+
+---
 
 UMQ (Universal Media Queuer)
 
