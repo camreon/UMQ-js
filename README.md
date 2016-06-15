@@ -1,8 +1,8 @@
-# UMQ (Universal Media Queuer)
+```
+NOTE: This repo is the original version. Use https://github.com/camreon/UMQ instead.
+```
 
-## DEMO:
-http://umq.herokuapp.com/
-
+UMQ (Universal Media Queuer)
 
 ## LOCAL SETUP:
 
